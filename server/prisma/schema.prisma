@@ -1,0 +1,88 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum MemberStatus {
+  ACTIVE
+  PROBATIONARY
+  CANCELLED
+}
+
+enum FuneralStatus {
+  OPEN
+  CLOSED
+}
+
+enum PaymentMethod {
+  EFT
+  ECOCASH
+  EWALLET
+  CASH
+  OTHER
+}
+
+model Admin {
+  id           String    @id @default(cuid())
+  name         String
+  email        String    @unique
+  passwordHash String
+  role         String    @default("admin")
+  createdAt    DateTime  @default(now())
+  payments     Payment[]
+}
+
+model Member {
+  id                String        @id @default(cuid())
+  memberNumber      Int           @unique
+  fullName          String
+  phone             String?
+  status            MemberStatus  @default(ACTIVE)
+  contributionsCount Int          @default(0)
+  hasBeenBeneficiary Boolean      @default(false)
+  joinedAt          DateTime      @default(now())
+  cancelledAt       DateTime?
+  notes             String?
+  payments          Payment[]
+  beneficiaryOf     FuneralEvent[] @relation("Beneficiary")
+
+  @@index([status])
+}
+
+model FuneralEvent {
+  id                     String        @id @default(cuid())
+  deceasedName           String
+  beneficiaryMemberId    String?
+  beneficiaryMember      Member?       @relation("Beneficiary", fields: [beneficiaryMemberId], references: [id])
+  dateOpened             DateTime      @default(now())
+  dateClosed             DateTime?
+  status                 FuneralStatus @default(OPEN)
+  collectionAccountNo    String?
+  collectionAccountHolder String?
+  collectionBank         String?
+  collectionEwallet      String?
+  collectionEcocash      String?
+  notes                  String?
+  payments               Payment[]
+}
+
+model Payment {
+  id              String        @id @default(cuid())
+  memberId        String
+  member          Member        @relation(fields: [memberId], references: [id])
+  funeralEventId  String
+  funeralEvent    FuneralEvent  @relation(fields: [funeralEventId], references: [id])
+  amount          Decimal       @db.Decimal(12, 2)
+  method          PaymentMethod @default(EFT)
+  reference       String?
+  paidAt          DateTime      @default(now())
+  recordedByAdminId String?
+  recordedByAdmin Admin?        @relation(fields: [recordedByAdminId], references: [id])
+  notes           String?
+
+  @@unique([memberId, funeralEventId])
+}

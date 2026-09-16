@@ -1,0 +1,23 @@
+@import "tailwindcss";
+
+:root {
+  --color-brand: #1f6f5c;
+  --color-brand-dark: #16503f;
+  --color-brand-light: #e7f3ef;
+  --color-danger: #c0392b;
+  --color-warn: #b7791f;
+  color-scheme: light;
+}
+
+html, body, #root {
+  height: 100%;
+}
+
+body {
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior-y: none;
+}
+
+* {
+  -webkit-font-smoothing: antialiased;
+}
