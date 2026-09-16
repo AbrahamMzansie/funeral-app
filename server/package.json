@@ -7,7 +7,8 @@
     "dev": "nodemon src/index.js",
     "start": "node src/index.js",
     "seed": "node prisma/seed.js",
-    "seed:funerals": "node prisma/seed-funerals.js"
+    "seed:funerals": "node prisma/seed-funerals.js",
+    "add-admin": "node prisma/add-admin.js"
   },
   "keywords": [],
   "author": "",

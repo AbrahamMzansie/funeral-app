@@ -83,6 +83,7 @@ model Payment {
   recordedByAdminId String?
   recordedByAdmin Admin?        @relation(fields: [recordedByAdminId], references: [id])
   notes           String?
+  slipImage       String?       // proof-of-payment photo, as a data URL (e.g. "data:image/jpeg;base64,...")
 
   @@unique([memberId, funeralEventId])
 }

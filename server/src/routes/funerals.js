@@ -108,10 +108,14 @@ router.patch('/:id', async (req, res) => {
 
 router.put('/:id/payments/:memberId', async (req, res) => {
   const { id: funeralEventId, memberId } = req.params
-  const { amount, method, reference, notes, paidAt } = req.body || {}
+  const { amount, method, reference, notes, paidAt, slipImage } = req.body || {}
 
   if (amount === undefined || amount === null || Number.isNaN(Number(amount))) {
     return res.status(400).json({ error: 'A valid amount is required' })
+  }
+
+  if (slipImage && !/^data:image\/(jpeg|jpg|png|webp);base64,/.test(slipImage)) {
+    return res.status(400).json({ error: 'Slip image must be a JPEG, PNG, or WEBP image' })
   }
 
   const member = await prisma.member.findUnique({ where: { id: memberId } })
@@ -133,6 +137,7 @@ router.put('/:id/payments/:memberId', async (req, res) => {
       notes: notes?.trim() || null,
       recordedByAdminId: req.admin.id,
       ...(paidAt ? { paidAt: new Date(paidAt) } : {}),
+      ...(slipImage !== undefined ? { slipImage } : {}),
     },
     create: {
       memberId,
@@ -142,6 +147,7 @@ router.put('/:id/payments/:memberId', async (req, res) => {
       reference: reference?.trim() || String(member.memberNumber),
       notes: notes?.trim() || null,
       recordedByAdminId: req.admin.id,
+      slipImage: slipImage || null,
       ...(paidAt ? { paidAt: new Date(paidAt) } : {}),
     },
   })

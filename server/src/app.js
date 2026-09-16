@@ -17,7 +17,7 @@ export function createApp() {
         : process.env.CLIENT_ORIGIN,
     })
   )
-  app.use(express.json())
+  app.use(express.json({ limit: '10mb' }))
 
   app.get('/api/health', (req, res) => res.json({ ok: true }))
 
